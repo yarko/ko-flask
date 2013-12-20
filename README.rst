@@ -32,6 +32,7 @@ flask (since working examples for KO exist);
 mongokit (to keep it simple - json for client);
   - rethinkdb has no schema-ish niceness to match;
   - sqlalchemy is too far away from "close to what we want for forms" (too low abstraction level at this point);
+
     - since there is familiarity w/ SQLAlchemy, we may move to this - but not for starters;
 
 mako in preference to jinja2, but only if things work;
@@ -50,5 +51,7 @@ WTForms (a flaskism, though will try to stay away all together if possible);
 Progress
 ========
 
-add the flask template, with sqlalchemy;
+- add the flask demo from another repo;
+
+
 
