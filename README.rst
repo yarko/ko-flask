@@ -52,7 +52,7 @@ WTForms (a flaskism, if / when needed, if proves useful);
 Running
 ========
 
-For information on the status, and running the various branches, see [the wiki](https://github.com/yarko/ko-flask/wiki).
+For information on the status, and running the various branches, see https://github.com/yarko/ko-flask/wiki.
 
 
 
