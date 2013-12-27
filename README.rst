@@ -49,10 +49,11 @@ sass / less - when the theming time comes;
 WTForms (a flaskism, if / when needed, if proves useful);
 
  
-Progress
+Running
 ========
 
-- add the flask demo from another repo;
+For information on the status, and running the various branches, see [the wiki](https://github.com/yarko/ko-flask/wiki).
+
 
 
 
