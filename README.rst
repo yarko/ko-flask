@@ -24,8 +24,8 @@ Plans (sort of)
 Intent:
 
 knockout.js - for two-way databinding.  Initially, this is the hub of this solution;
-  - MVVM alternatives might be polymer.dart (but that would be a "Version 2" sort of effort/experiment);
-  - should also look at / compare angular.js and / or angular.dart;
+  - should also look at / compare angular.js and / or ember.js (and possibly their dart ports);
+  - for some comparisons of these three, see http://youtu.be/mVjpwia1YN4
 
 flask (since working examples for KO exist);
   - may one day move up to django, but for getting all the moving parts worked out, flask.
