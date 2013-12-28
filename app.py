@@ -1,5 +1,11 @@
+from datetime import datetime
+
 from flask import Flask, render_template, request, jsonify, _app_ctx_stack
-from sqlite3 import dbapi2 as sqlite3
+# added for MongoKit:
+from flask import redirect, url_for
+from flask.ext.mongokit import MongoKit, Document
+
+#from sqlite3 import dbapi2 as sqlite3
 
 DATABASE = 'todos.db'
 DEBUG = True
@@ -8,25 +14,30 @@ SECRET_KEY = 'some super secret development key'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-def init_db():
-    with app.app_context():
-        db = get_db()
-        with app.open_resource('schema.sql') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+# the data model
+class Task(Document):
+    __collection__ = 'tasks'
+    structure = {
+        'title': unicode,
+        'description': unicode,
+        'creation': datetime,
+    }
+    required_fields = ['title', 'creation']
+    default_values = {'creation': datetime.utcnow}
+    use_dot_notation = True
 
-def get_db():
-    top = _app_ctx_stack.top
-    if not hasattr(top, 'sqlite_db'):
-        top.sqlite_db = sqlite3.connect(app.config['DATABASE'])
-        top.sqlite_db.row_factory = sqlite3.Row
-    return top.sqlite_db
 
-@app.teardown_appcontext
-def close_database(exception):
-    top = _app_ctx_stack.top
-    if hasattr(top, 'sqlite_db'):
-        top.sqlite_db.close()
+db = MongoKit(app)
+db.register([Task])
+
+# def get_db():
+#     return MongoKit(app)
+
+#@app.teardown_appcontext
+# def close_database(exception):
+#   top = _app_ctx_stack.top
+#   if hasattr(top, 'sqlite_db'):
+#       top.sqlite_db.close()
 
 @app.route('/')
 def index():
@@ -34,22 +45,25 @@ def index():
 
 @app.route('/tasks')
 def todos():
-    db = get_db()
-    cur = db.execute('select title, description from todos order by id asc')
-    entries = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
+    entries = db.Task.find()
     return jsonify(tasks=entries)
 
-@app.route('/tasks/new', methods=['POST'])
+@app.route('/tasks/new', methods=['GET', 'POST'])
 def new_todo():
-    db = get_db()
-    cur = db.execute('insert into todos (title, description) values (?, ?)',
-               [request.json['title'], request.json['description']])
-    db.commit()
-    id = cur.lastrowid
+    if request.method == 'POST':
+        task = db.Task()
+        task.title = request.json['title']
+        task.description = request.json['description']
+        task.save()
+        return redirect(url_for('index'))
     return jsonify({"title": request.json['title'],
                     "description": request.json['description'],
-                    "id": id})
+                     })
 
 if __name__ == '__main__':
-    init_db()
+    # for debugging w/ wingIDE:
+    if __debug__:
+        from os import environ
+        if 'WINGDB_ACTIVE' in environ:
+            app.debug = False  # let wing debugger hangle
     app.run()
