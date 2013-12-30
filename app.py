@@ -5,6 +5,8 @@ from flask import Flask, render_template, request, jsonify, _app_ctx_stack
 from flask import redirect, url_for
 from flask.ext.mongokit import MongoKit, Document
 
+from flask_debugtoolbar import DebugToolbarExtension
+
 #from sqlite3 import dbapi2 as sqlite3
 
 DATABASE = 'todos.db'
@@ -13,6 +15,8 @@ SECRET_KEY = 'some super secret development key'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+toolbar = DebugToolbarExtension(app)
 
 # the data model
 class Task(Document):
