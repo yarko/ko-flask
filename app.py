@@ -37,35 +37,6 @@ db.register([Task])
 # def get_db():
 #     return MongoKit(app)
 
-def mongoify(*args, **kwargs):
-    """Creates a :class:`~flask.Response` with the JSON representation of
-    the given arguments with an `application/json` mimetype.  The arguments
-    to this function are the same as to the :class:`dict` constructor.
-
-    Example usage::
-
-        @app.route('/_get_current_user')
-        def get_current_user():
-            return jsonify(username=g.user.username,
-                           email=g.user.email,
-                           id=g.user.id)
-
-    This will send a JSON response like this to the browser::
-
-        {
-            "username": "admin",
-            "email": "admin@localhost",
-            "id": 42
-        }
-
-    This requires Python 2.6 or an installed version of simplejson.  For
-    security reasons only objects are supported toplevel.  For more
-    information about this, have a look at :ref:`json-security`.
-
-    .. versionadded:: 0.2
-    """
-    return app.response_class(dict(*args, **kwargs), mimetype='application/json')
-
 #@app.teardown_appcontext
 # def close_database(exception):
 #   top = _app_ctx_stack.top
@@ -74,30 +45,28 @@ def mongoify(*args, **kwargs):
 
 @app.route('/')
 def index():
+    # doesn't seem to display newly updated entries, w/o browser refresh?
     return render_template('index.html')
 
 @app.route('/tasks')
 def todos():
     entries = db.Task.find()
     tasks = list(entries)
+    # this for loop probably not necessary:
     for i in tasks:
         i.pop(u'_id')
-    # return jsonify(tasks=list(entries))
-    # return jsonify(tasks=[i.to_json() for i in tasks])
-    return mongoify(tasks=[i.to_json() for i in tasks])
+    return jsonify(tasks=tasks)
 
 @app.route('/tasks/new', methods=['GET', 'POST'])
 def new_todo():
     if request.method == 'POST':
         task = db.Task()   # create, w/ default creation;
         ## one of two ways:
-        rtask = request.json   # creation is not part of it
-        # rtask.pop('creation')
+        # rtask = request.json   # creation date is not part of this
         ## alternately, could have done this:
-        # rtask = {}
-        # rtask.title = request.json['title']
-        # rtask.description = request.json['description']
-        task.update(rtask)     # update desired fields
+        task.title = request.json['title']
+        task.description = request.json['description']
+        # task.update(rtask)     # update desired fields
         task.save()
         return redirect(url_for('index'))
     return jsonify({"title": request.json['title'],
