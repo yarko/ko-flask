@@ -7,8 +7,6 @@ from flask.ext.mongokit import MongoKit, Document
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
-#from sqlite3 import dbapi2 as sqlite3
-
 DATABASE = 'todos.db'
 DEBUG = True
 SECRET_KEY = 'some super secret development key'
@@ -34,14 +32,6 @@ class Task(Document):
 db = MongoKit(app)
 db.register([Task])
 
-# def get_db():
-#     return MongoKit(app)
-
-#@app.teardown_appcontext
-# def close_database(exception):
-#   top = _app_ctx_stack.top
-#   if hasattr(top, 'sqlite_db'):
-#       top.sqlite_db.close()
 
 @app.route('/')
 def index():
