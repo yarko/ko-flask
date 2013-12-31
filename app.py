@@ -50,9 +50,10 @@ def index():
 
 @app.route('/tasks')
 def todos():
-    entries = db.Task.find()
+    entries = db.Task.find()  # returns a db cursor
     tasks = list(entries)
-    # this for loop probably not necessary:
+    # this is necessary since _id isn't json serializable
+    #   - either this, or use mongokit i.to_json:
     for i in tasks:
         i.pop(u'_id')
     return jsonify(tasks=tasks)
@@ -63,10 +64,11 @@ def new_todo():
         task = db.Task()   # create, w/ default creation;
         ## one of two ways:
         # rtask = request.json   # creation date is not part of this
-        ## alternately, could have done this:
+        # task.update(rtask)     # update desired fields
+        ## alternately:
         task.title = request.json['title']
         task.description = request.json['description']
-        # task.update(rtask)     # update desired fields
+        #
         task.save()
         return redirect(url_for('index'))
     return jsonify({"title": request.json['title'],
